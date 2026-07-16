@@ -37,6 +37,7 @@ format:
   dashboard:
     theme: flatly
     css: assets/styles.css
+    include-after-body: assets/plotly-resize.html
     expandable: true
 
 execute:

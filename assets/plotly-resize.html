@@ -1,0 +1,28 @@
+<script>
+// Quarto dashboard cards size asynchronously and plotly figures are plotted
+// after window load, so a figure can be drawn at the wrong dimensions and
+// never recover (plotly only listens to window resize). Re-fit every plot a
+// few times after load, and again whenever its card resizes.
+(function () {
+  function fitAll() {
+    if (!window.Plotly) return;
+    document.querySelectorAll(".plotly-graph-div").forEach(function (gd) {
+      if (gd._fullLayout) {
+        try { Plotly.Plots.resize(gd); } catch (e) {}
+      }
+    });
+  }
+  window.addEventListener("load", function () {
+    [200, 600, 1500, 3000].forEach(function (ms) { setTimeout(fitAll, ms); });
+    if (window.ResizeObserver) {
+      document.querySelectorAll(".plotly-graph-div").forEach(function (gd) {
+        new ResizeObserver(function () {
+          if (gd._fullLayout && window.Plotly) {
+            try { Plotly.Plots.resize(gd); } catch (e) {}
+          }
+        }).observe(gd.parentElement);
+      });
+    }
+  });
+})();
+</script>
