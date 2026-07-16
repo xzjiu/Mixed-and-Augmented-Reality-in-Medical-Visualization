@@ -1,0 +1,48 @@
+project:
+  type: website
+  output-dir: _site
+  pre-render:
+    - python3 scripts/01_clean_data.py
+    - python3 scripts/02_make_summary_tables.py
+  post-render:
+    - python3 scripts/03_strip_mathjax.py
+  resources:
+    - data/raw/review_dataset.csv
+    - data/processed/studies.csv
+
+website:
+  title: "Medical AR/MR Visualization"
+  description: "Interactive evidence map of a study-level systematic review of AR/MR visualization in medicine."
+  navbar:
+    background: primary
+    left:
+      - href: index.qmd
+        text: Home
+      - href: overview.qmd
+        text: Overview
+      - href: clinical.qmd
+        text: Clinical Areas
+      - href: technology.qmd
+        text: Technology
+      - href: visualization.qmd
+        text: Visualization Methods
+      - href: articles.qmd
+        text: Article Explorer
+      - href: about.qmd
+        text: About
+  page-footer:
+    center: "Medical AR/MR Visualization in Medicine — Interactive Evidence Map"
+
+format:
+  dashboard:
+    theme: flatly
+    css: assets/styles.css
+    expandable: true
+
+execute:
+  echo: false
+  warning: false
+
+# Dashboards default to displaying every bare expression in a cell, which
+# duplicates figures whose update_*() calls return the figure object.
+ipynb-shell-interactivity: last_expr

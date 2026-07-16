@@ -1,0 +1,71 @@
+---
+title: "Visualization Methods"
+---
+
+```{python}
+#| output: false
+import sys
+sys.path.insert(0, "scripts")
+import pandas as pd
+import plotly.express as px
+from dash_helpers import load, count_bar, COLOR_SEQ
+
+studies = load("studies.csv")
+anchoring = load("anchoring_long.csv")
+cues = load("perception_cues_long.csv")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Studies by rendering type
+count_bar(studies["rendering_type_label"])
+```
+
+```{python}
+#| title: "Studies by registration method (where reported)"
+count_bar(studies["registration_method_label"].dropna(), color="#f16913")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Studies by anchoring context
+count_bar(anchoring["anchoring_context_label"], color="#41ab5d")
+```
+
+```{python}
+#| title: Perception support
+support = (studies["perception_support"]
+           .map({True: "With perception cues", False: "No perception cues"})
+           .fillna("No perception cues")
+           .value_counts())
+pct = support / support.sum() * 100
+# counts and shares go into the category labels: plotly.js bar text labels
+# render unreliably inside dashboard cards, axis labels always render
+labels = [
+    f"{name}<br>{v} ({p:.0f}%)"
+    for name, v, p in zip(support.index, support.values, pct)
+]
+fig = px.bar(x=support.values, y=labels, orientation="h")
+fig.update_traces(
+    marker_color=COLOR_SEQ[: len(support)],
+    hovertemplate="%{x} studies<extra></extra>",
+)
+fig.update_layout(
+    xaxis_title="Number of studies",
+    yaxis_title=None,
+    margin=dict(l=10, r=10, t=10, b=10),
+)
+fig
+```
+
+```{python}
+#| title: "Perception cues used (studies with perception support)"
+# fold rarely used cues (fewer than 3 studies) into a single bucket
+cue_labels = cues["perception_cues_label"]
+counts = cue_labels.value_counts()
+rare = counts[counts < 3].index
+count_bar(cue_labels.replace(dict.fromkeys(rare, "Other pictorial")),
+          color="#807dba")
+```

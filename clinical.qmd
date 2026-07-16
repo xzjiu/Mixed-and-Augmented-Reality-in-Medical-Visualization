@@ -1,0 +1,44 @@
+---
+title: "Clinical Areas"
+---
+
+```{python}
+#| output: false
+import sys
+sys.path.insert(0, "scripts")
+import pandas as pd
+from dash_helpers import load, count_bar, heatmap
+
+studies = load("studies.csv")
+workflow = load("workflow_long.csv")
+target = load("target_long.csv")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Studies by clinical specialty
+count_bar(studies["specialty_label"])
+```
+
+```{python}
+#| title: Studies by workflow stage
+count_bar(workflow["workflow_stage_label"], color="#41ab5d")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Studies by evaluation target
+count_bar(target["evaluation_target_label"], color="#807dba")
+```
+
+```{python}
+#| title: "Specialty × workflow stage"
+#| classes: mobile-scroll
+merged = workflow.merge(
+    studies[["record_id", "specialty_label"]], on="record_id"
+)
+cross = pd.crosstab(merged["specialty_label"], merged["workflow_stage_label"])
+heatmap(cross, xlab="Workflow stage", ylab="Specialty")
+```

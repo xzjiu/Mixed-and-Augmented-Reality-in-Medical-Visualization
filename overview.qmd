@@ -1,0 +1,85 @@
+---
+title: "Overview"
+---
+
+```{python}
+#| output: false
+import sys
+sys.path.insert(0, "scripts")
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from dash_helpers import load, count_bar, ACCENT, COLOR_SEQ
+
+studies = load("studies.csv")
+workflow = load("workflow_long.csv")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Publication trend by year
+years = studies["publication_year"].value_counts().sort_index()
+fig = px.bar(x=years.index, y=years.values)
+fig.update_traces(marker_color=ACCENT,
+                  hovertemplate="Year %{x}<br>%{y} studies<extra></extra>")
+fig.update_layout(xaxis_title="Publication year",
+                  yaxis_title="Number of studies",
+                  margin=dict(l=10, r=10, t=10, b=10))
+fig
+```
+
+```{python}
+#| title: Studies by analysis period
+order = ["Before 2010", "2010-2015", "2016-2020", "2021-2026"]
+periods = studies["analysis_period"].value_counts().reindex(order)
+fig = px.bar(x=periods.index, y=periods.values,
+             color=periods.index, color_discrete_sequence=COLOR_SEQ)
+fig.update_traces(hovertemplate="%{x}<br>%{y} studies<extra></extra>")
+fig.update_layout(xaxis_title=None, yaxis_title="Number of studies",
+                  showlegend=False, margin=dict(l=10, r=10, t=10, b=10))
+fig
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: "Workflow stage → device → rendering type (Sankey)"
+#| classes: mobile-scroll
+w = workflow[["record_id", "workflow_stage_label"]]
+merged = w.merge(
+    studies[["record_id", "device_label", "rendering_type_label"]],
+    on="record_id",
+).dropna()
+
+links1 = (merged.groupby(["workflow_stage_label", "device_label"])
+          .size().reset_index(name="n"))
+links2 = (merged.groupby(["device_label", "rendering_type_label"])
+          .size().reset_index(name="n"))
+
+stages = sorted(merged["workflow_stage_label"].unique())
+devices = sorted(merged["device_label"].unique())
+renders = sorted(merged["rendering_type_label"].unique())
+nodes = stages + devices + renders
+idx = {name: i for i, name in enumerate(nodes)}
+# devices reappear as targets and sources, so offset device index once
+dev_idx = {name: len(stages) + i for i, name in enumerate(devices)}
+ren_idx = {name: len(stages) + len(devices) + i for i, name in enumerate(renders)}
+stage_idx = {name: i for i, name in enumerate(stages)}
+
+source = ([stage_idx[s] for s in links1["workflow_stage_label"]]
+          + [dev_idx[d] for d in links2["device_label"]])
+target = ([dev_idx[d] for d in links1["device_label"]]
+          + [ren_idx[r] for r in links2["rendering_type_label"]])
+value = list(links1["n"]) + list(links2["n"])
+
+palette = (COLOR_SEQ * ((len(nodes) // len(COLOR_SEQ)) + 1))[: len(nodes)]
+fig = go.Figure(go.Sankey(
+    node=dict(label=nodes, pad=12, thickness=14, color=palette),
+    link=dict(source=source, target=target, value=value,
+              hovertemplate="%{source.label} → %{target.label}<br>"
+                            "%{value} studies<extra></extra>"),
+))
+fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), font_size=11)
+fig
+```

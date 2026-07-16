@@ -1,0 +1,78 @@
+---
+title: "Medical AR/MR Visualization in Medicine: Interactive Evidence Map"
+---
+
+```{python}
+#| output: false
+import sys
+sys.path.insert(0, "scripts")
+import plotly.express as px
+from dash_helpers import load, load_summary, ACCENT
+
+studies = load("studies.csv")
+summary = load_summary()
+```
+
+## Row {height=20%}
+
+```{python}
+#| content: valuebox
+#| title: "Studies"
+dict(icon="journal-text", color="primary", value=summary["n_studies"])
+```
+
+```{python}
+#| content: valuebox
+#| title: "Year range"
+dict(icon="calendar-range", color="info",
+     value=f"{summary['year_min']}–{summary['year_max']}")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Clinical specialties"
+dict(icon="heart-pulse", color="success", value=summary["n_specialties"])
+```
+
+```{python}
+#| content: valuebox
+#| title: "Display devices"
+dict(icon="badge-ar", color="warning", value=summary["n_devices"])
+```
+
+```{python}
+#| content: valuebox
+#| title: "Imaging modalities"
+dict(icon="layers", color="secondary", value=summary["n_modalities"])
+```
+
+## Row {height=65%}
+
+```{python}
+#| title: Publication trend over time
+years = studies["publication_year"].value_counts().sort_index()
+fig = px.area(x=years.index, y=years.values)
+fig.update_traces(
+    line_color=ACCENT,
+    hovertemplate="Year %{x}<br>%{y} studies<extra></extra>",
+)
+fig.update_layout(
+    xaxis_title="Publication year",
+    yaxis_title="Number of studies",
+    margin=dict(l=10, r=10, t=10, b=10),
+)
+fig
+```
+
+## Row {height=15%}
+
+::: {.card}
+An interactive dashboard based on a study-level systematic review dataset of
+augmented reality (AR) and mixed reality (MR) visualization in medicine.
+
+[Explore by clinical specialty](clinical.qmd){.btn .btn-primary .btn-sm}
+[Explore by technology](technology.qmd){.btn .btn-primary .btn-sm}
+[Visualization methods](visualization.qmd){.btn .btn-primary .btn-sm}
+[Open article explorer](articles.qmd){.btn .btn-success .btn-sm}
+[Download dataset](data/raw/review_dataset.csv){.btn .btn-outline-secondary .btn-sm}
+:::

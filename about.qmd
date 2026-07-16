@@ -1,0 +1,54 @@
+---
+title: "About"
+---
+
+## Row
+
+::: {.card title="About this dashboard"}
+This dashboard is an interactive evidence map built on a study-level
+systematic review dataset of augmented reality (AR) and mixed reality (MR)
+visualization in medicine. It covers **313 studies** published between 1996
+and 2026.
+
+All charts are generated from a single CSV file
+([download](data/raw/review_dataset.csv)). Updating the CSV and re-rendering
+the site refreshes every figure and table automatically.
+:::
+
+## Row
+
+::: {.card title="Variable descriptions"}
+
+| Variable | Description |
+|---|---|
+| `record_id` | Unique identifier of each included study |
+| `citation_key` | First author and publication year |
+| `title` / `journal` / `publication_year` | Bibliographic information |
+| `analysis_period` | Period bucket used in trend analyses (Before 2010, 2010-2015, 2016-2020, 2021-2026) |
+| `study_summary` | One-sentence summary of the study |
+| `case_report` | Whether the study is a clinical case report |
+| `workflow_stage` | Clinical workflow stage(s) addressed: diagnosis, education, training, planning, intraoperative, method development |
+| `specialty` | Clinical specialty of the application |
+| `evaluation_target` | What the system was evaluated on: phantom, animal, cadaver, patient, human subject, dataset, virtual |
+| `device` | AR/MR display device: optical/video see-through HMD, spatial monitor, projection, handheld, microscope, etc. |
+| `dimensionality` | Dimensionality of the visualized content (2D, 3D, 2D+3D, 4D) |
+| `image_modalities` | Medical imaging modality/modalities visualized (CT, MRI, ultrasound, X-ray, RGB, …) |
+| `rendering_type` | Rendering approach: surface modeling, volume rendering, no post-processing, other |
+| `aux_visualization_content` | Auxiliary visual content such as tool location or information panels |
+| `anchoring_context` | Spatial anchoring of the virtual content: in-situ, off-situ, inter-situ |
+| `registration_method` | Registration approach: optical marker, other marker, markerless, manual |
+| `perception_support` / `perception_cues` | Whether and how depth-perception cues (occlusion, shadow, color, …) are provided |
+
+Multi-label fields use a pipe (`|`) separator in the raw CSV and are split
+into long-format tables before counting, so each study contributes one count
+per label.
+:::
+
+## Row
+
+::: {.card title="How to cite"}
+If you use this dashboard or the underlying dataset, please cite the
+accompanying systematic review (citation to be added upon publication).
+
+The dataset is provided as Supplementary Data S1 of the review.
+:::

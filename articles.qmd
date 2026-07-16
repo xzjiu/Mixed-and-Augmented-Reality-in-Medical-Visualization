@@ -1,0 +1,66 @@
+---
+title: "Article Explorer"
+---
+
+```{python}
+#| output: false
+import sys
+sys.path.insert(0, "scripts")
+import itables
+from dash_helpers import load
+
+studies = load("studies.csv")
+
+table = (
+    studies[
+        [
+            "title",
+            "journal",
+            "publication_year",
+            "specialty_label",
+            "workflow_stage_label",
+            "device_label",
+            "image_modalities_label",
+            "study_summary",
+        ]
+    ]
+    .rename(
+        columns={
+            "title": "Title",
+            "journal": "Journal",
+            "publication_year": "Year",
+            "specialty_label": "Specialty",
+            "workflow_stage_label": "Workflow Stage",
+            "device_label": "Device",
+            "image_modalities_label": "Image Modalities",
+            "study_summary": "Study Summary",
+        }
+    )
+    .sort_values("Year", ascending=False)
+)
+```
+
+## Row
+
+```{python}
+#| title: "Browse, search and filter the 313 included studies"
+itables.show(
+    table,
+    maxBytes=0,
+    layout={"topStart": "search", "topEnd": "buttons"},
+    buttons=["copyHtml5", "csvHtml5"],
+    column_filters="header",
+    lengthMenu=[10, 25, 50, 100],
+    pageLength=25,
+    scrollX=True,
+    order=[[2, "desc"]],
+    columnDefs=[
+        {"targets": [0], "width": "24%"},
+        {"targets": [7], "width": "30%"},
+        {"targets": "_all", "className": "dt-left"},
+    ],
+    style="width:100%",
+    classes="display cell-border",
+    showIndex=False,
+)
+```

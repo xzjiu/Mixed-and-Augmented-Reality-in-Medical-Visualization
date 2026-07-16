@@ -1,0 +1,43 @@
+---
+title: "Technology"
+---
+
+```{python}
+#| output: false
+import sys
+sys.path.insert(0, "scripts")
+import pandas as pd
+from dash_helpers import load, count_bar, heatmap
+
+studies = load("studies.csv")
+modality = load("modality_long.csv")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Studies by display device
+count_bar(studies["device_label"])
+```
+
+```{python}
+#| title: Studies by dimensionality
+count_bar(studies["dimensionality_label"], color="#f16913")
+```
+
+## Row {height=50%}
+
+```{python}
+#| title: Studies by image modality
+count_bar(modality["image_modalities_label"], color="#41ab5d")
+```
+
+```{python}
+#| title: "Device × image modality"
+#| classes: mobile-scroll
+merged = modality.merge(
+    studies[["record_id", "device_label"]], on="record_id"
+)
+cross = pd.crosstab(merged["device_label"], merged["image_modalities_label"])
+heatmap(cross, xlab="Image modality", ylab="Device")
+```
