@@ -178,7 +178,7 @@ Browse, search and filter the 313 included studies
 <div class="card-body html-fill-item html-fill-container">
 <div class="cell-output cell-output-display html-fill-item html-fill-container">
 <!--| quarto-html-table-processing: none -->
-<table id="itables_ffb297d5_5a1f_424c_8b7b_22d653eeb2e2">
+<table id="itables_17de044c_f693_42b2_ba52_1811049588fb">
   <tbody>
     <tr>
       <td style="vertical-align:middle; text-align:left"><a href="https://mwouts.github.io/itables/"><svg class="main-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" width="64" viewbox="0 0 500 400" style="font-family: 'Droid Sans', sans-serif;">
@@ -248,7 +248,7 @@ Browse, search and filter the 313 included studies
 <script type="module">
     import { ITable, jQuery as $ } from 'https://www.unpkg.com/dt_for_itables@2.5.5/dt_bundle.js';
 
-    document.querySelectorAll("#itables_ffb297d5_5a1f_424c_8b7b_22d653eeb2e2:not(.dataTable)").forEach(table => {
+    document.querySelectorAll("#itables_17de044c_f693_42b2_ba52_1811049588fb:not(.dataTable)").forEach(table => {
         if (!(table instanceof HTMLTableElement))
             return;
 
@@ -294,6 +294,34 @@ Browse, search and filter the 313 included studies
 </div>
 
 
+<script>
+// Quarto dashboard cards size asynchronously and plotly figures are plotted
+// after window load, so a figure can be drawn at the wrong dimensions and
+// never recover (plotly only listens to window resize). Re-fit every plot a
+// few times after load, and again whenever its card resizes.
+(function () {
+  function fitAll() {
+    if (!window.Plotly) return;
+    document.querySelectorAll(".plotly-graph-div").forEach(function (gd) {
+      if (gd._fullLayout) {
+        try { Plotly.Plots.resize(gd); } catch (e) {}
+      }
+    });
+  }
+  window.addEventListener("load", function () {
+    [200, 600, 1500, 3000].forEach(function (ms) { setTimeout(fitAll, ms); });
+    if (window.ResizeObserver) {
+      document.querySelectorAll(".plotly-graph-div").forEach(function (gd) {
+        new ResizeObserver(function () {
+          if (gd._fullLayout && window.Plotly) {
+            try { Plotly.Plots.resize(gd); } catch (e) {}
+          }
+        }).observe(gd.parentElement);
+      });
+    }
+  });
+})();
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
