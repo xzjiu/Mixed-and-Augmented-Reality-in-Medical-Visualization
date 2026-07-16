@@ -1,0 +1,11 @@
+/* On narrow screens, dense charts (heatmaps, sankey) keep a usable minimum
+   width and scroll horizontally inside their card instead of squeezing. */
+@media (max-width: 767.98px) {
+  .mobile-scroll .card-body {
+    overflow-x: auto;
+  }
+  .mobile-scroll .card-body .cell-output-display,
+  .mobile-scroll .card-body .plotly-graph-div {
+    min-width: 640px;
+  }
+}
